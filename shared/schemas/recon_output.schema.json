@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ARGUS Recon Output",
+  "description": "Output contract from Member 1 (Recon Engine) to Member 2 (Risk Engine)",
+  "type": "object",
+  "required": ["asset", "services"],
+  "properties": {
+    "asset": {
+      "type": "object",
+      "required": ["hostname", "ip", "exposure"],
+      "properties": {
+        "hostname": { "type": "string" },
+        "ip": { "type": "string" },
+        "exposure": {
+          "type": "string",
+          "enum": ["internal", "external"]
+        }
+      }
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["port", "protocol", "service_name"],
+        "properties": {
+          "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+          "protocol": { "type": "string", "enum": ["tcp", "udp"] },
+          "service_name": { "type": "string" },
+          "product": { "type": "string" },
+          "version": { "type": "string" },
+          "banner": { "type": "string" }
+        }
+      }
+    }
+  }
+}

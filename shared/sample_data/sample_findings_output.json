@@ -1,0 +1,53 @@
+[
+  {
+    "asset": "api.lab.local",
+    "port": 443,
+    "product": "nginx",
+    "version": "1.18.0",
+    "findings": [
+      {
+        "cve_id": "CVE-2021-23017",
+        "cvss_score": 9.8,
+        "severity": "CRITICAL",
+        "known_exploited": false,
+        "risk_score": 78,
+        "priority": "HIGH",
+        "confidence": 0.85
+      }
+    ]
+  },
+  {
+    "asset": "db01.lab.local",
+    "port": 3306,
+    "product": "MySQL",
+    "version": "5.7.31",
+    "findings": [
+      {
+        "cve_id": "CVE-2020-14812",
+        "cvss_score": 4.7,
+        "severity": "MEDIUM",
+        "known_exploited": false,
+        "risk_score": 25,
+        "priority": "LOW",
+        "confidence": 0.6
+      }
+    ]
+  },
+  {
+    "asset": "vpn01.lab.local",
+    "port": 443,
+    "product": "Apache",
+    "version": "2.4.29",
+    "findings": [
+      {
+        "cve_id": "CVE-2021-41773",
+        "cvss_score": 7.5,
+        "severity": "HIGH",
+        "known_exploited": true,
+        "risk_score": 91,
+        "priority": "CRITICAL",
+        "confidence": 0.95
+      }
+    ]
+  }
+]

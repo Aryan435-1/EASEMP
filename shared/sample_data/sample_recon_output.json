@@ -1,0 +1,61 @@
+[
+  {
+    "asset": {
+      "hostname": "api.lab.local",
+      "ip": "192.168.56.20",
+      "exposure": "external"
+    },
+    "services": [
+      {
+        "port": 443,
+        "protocol": "tcp",
+        "service_name": "https",
+        "product": "nginx",
+        "version": "1.18.0",
+        "banner": "nginx/1.18.0 (Ubuntu)"
+      },
+      {
+        "port": 22,
+        "protocol": "tcp",
+        "service_name": "ssh",
+        "product": "OpenSSH",
+        "version": "7.6p1",
+        "banner": "SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3"
+      }
+    ]
+  },
+  {
+    "asset": {
+      "hostname": "db01.lab.local",
+      "ip": "192.168.56.30",
+      "exposure": "internal"
+    },
+    "services": [
+      {
+        "port": 3306,
+        "protocol": "tcp",
+        "service_name": "mysql",
+        "product": "MySQL",
+        "version": "5.7.31",
+        "banner": "5.7.31-0ubuntu0.18.04.1"
+      }
+    ]
+  },
+  {
+    "asset": {
+      "hostname": "vpn01.lab.local",
+      "ip": "192.168.56.40",
+      "exposure": "external"
+    },
+    "services": [
+      {
+        "port": 443,
+        "protocol": "tcp",
+        "service_name": "https",
+        "product": "Apache",
+        "version": "2.4.29",
+        "banner": "Apache/2.4.29 (Ubuntu)"
+      }
+    ]
+  }
+]
