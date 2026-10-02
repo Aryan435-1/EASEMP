@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import AttackSurfaceGraph from './AttackSurfaceGraph';
 
 /**
  * EEIP — Enterprise Attack Surface & Exposure Management Platform
@@ -101,6 +102,9 @@ function App() {
     );
   }
 
+  // Check if both assets and findings are fully loaded for graph rendering
+  const isGraphDataReady = Boolean(assets && assets.length > 0 && findings);
+
   // =========================================================================
   // 4. MAIN DASHBOARD UI RENDER
   // =========================================================================
@@ -172,6 +176,16 @@ function App() {
             </tbody>
           </table>
         </div>
+      </section>
+
+      {/* Attack Surface Graph Section */}
+      <section className="dashboard-section">
+        <h2>Attack Surface Graph</h2>
+        {isGraphDataReady ? (
+          <AttackSurfaceGraph assets={assets} findings={findings} />
+        ) : (
+          <div className="no-data">Graph data loading...</div>
+        )}
       </section>
 
       {/* Findings Section */}

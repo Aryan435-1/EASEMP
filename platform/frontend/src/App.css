@@ -112,7 +112,7 @@ body {
   line-height: 1;
 }
 
-/* Dashboard Content Sections (Asset Inventory & Findings) */
+/* Dashboard Content Sections (Asset Inventory, Graph & Findings) */
 .dashboard-section {
   display: flex;
   flex-direction: column;
@@ -173,4 +173,31 @@ body {
   text-align: center;
   color: #64748b;
   padding: 24px;
+}
+
+/* Attack Surface SVG Graph Styling */
+.attack-surface-graph-container {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background-color: #1e293b;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25);
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.attack-surface-svg {
+  background-color: #0f172a;
+  border-radius: 6px;
+  border: 1px solid #1e293b;
+}
+
+.graph-node circle {
+  transition: r 0.2s ease, stroke-width 0.2s ease;
+}
+
+.graph-node:hover circle {
+  r: 31;
+  stroke-width: 4.5;
+  cursor: pointer;
 }
