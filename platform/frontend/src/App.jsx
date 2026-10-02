@@ -83,6 +83,11 @@ function App() {
     }
   };
 
+  // Helper handler to trigger opening the report endpoint in a new window/tab
+  const handleDownloadReport = () => {
+    window.open('http://127.0.0.1:8000/api/report', '_blank');
+  };
+
   // =========================================================================
   // 3. CONDITIONAL RENDER: ERROR & LOADING STATES
   // =========================================================================
@@ -110,9 +115,14 @@ function App() {
   // =========================================================================
   return (
     <div className="app-container">
-      {/* Header Section */}
+      {/* Header Section with Download Report Action */}
       <header className="dashboard-header">
-        <h1>EEIP — Enterprise Attack Surface & Exposure Management Platform</h1>
+        <div className="header-content">
+          <h1>EEIP — Enterprise Attack Surface & Exposure Management Platform</h1>
+          <button className="btn-download-report" onClick={handleDownloadReport}>
+            Download Report
+          </button>
+        </div>
       </header>
 
       {/* Summary Cards Section (4 cards in a row for Critical, High, Medium, Low) */}
