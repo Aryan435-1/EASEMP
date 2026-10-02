@@ -64,7 +64,7 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
     label: 'Internet',
     x: width / 2,
     y: 65,
-    color: '#38bdf8' // Distinct neutral blue color for non-scored Internet node
+    color: '#38bdf8'
   };
 
   // Compute X positions for External Assets (Row 1, Y = 210)
@@ -101,7 +101,12 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
   });
 
   return (
-    <div className="attack-surface-graph-container">
+    <div className="attack-surface-graph-container premium-card">
+      {/* Terminal Header Bar */}
+      <div className="terminal-header-bar">
+        <span className="terminal-title">ATTACK-SURFACE.TOPOLOGY</span>
+      </div>
+
       <svg
         viewBox={`0 0 ${width} ${height}`}
         className="attack-surface-svg"
@@ -119,8 +124,8 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
               y1={internetNode.y}
               x2={node.x}
               y2={node.y}
-              stroke="#64748b"
-              strokeWidth="2.5"
+              stroke="#475569"
+              strokeWidth="2"
               strokeDasharray="4 4"
             />
           ))}
@@ -135,8 +140,8 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
                 y1={target.y}
                 x2={node.x}
                 y2={node.y}
-                stroke="#475569"
-                strokeWidth="2.5"
+                stroke="#334155"
+                strokeWidth="2"
               />
             );
           })}
@@ -150,17 +155,17 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
             cx={internetNode.x}
             cy={internetNode.y}
             r={nodeRadius}
-            fill="#1e293b"
+            fill="#0f172a"
             stroke={internetNode.color}
-            strokeWidth="3.5"
+            strokeWidth="3"
           />
-          {/* Cloud icon or label inside Internet node */}
+          {/* Label inside Internet node */}
           <text
             x={internetNode.x}
             y={internetNode.y + 4}
             fill="#38bdf8"
             fontSize="12"
-            fontWeight="bold"
+            fontWeight="600"
             textAnchor="middle"
           >
             WAN
@@ -170,8 +175,8 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
             x={internetNode.x}
             y={internetNode.y + nodeRadius + 16}
             fill="#94a3b8"
-            fontSize="13"
-            fontWeight="600"
+            fontSize="12"
+            fontWeight="500"
             textAnchor="middle"
           >
             Internet
@@ -187,9 +192,9 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
               cx={node.x}
               cy={node.y}
               r={nodeRadius}
-              fill="#1e293b"
+              fill="#0f172a"
               stroke={node.color}
-              strokeWidth="3.5"
+              strokeWidth="3"
             />
             {/* Risk score badge inside circle */}
             <text
@@ -197,7 +202,8 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
               y={node.y + 5}
               fill="#f8fafc"
               fontSize="13"
-              fontWeight="bold"
+              fontFamily="JetBrains Mono, monospace"
+              fontWeight="600"
               textAnchor="middle"
             >
               {node.maxRisk}
@@ -206,8 +212,9 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
             <text
               x={node.x}
               y={node.y + nodeRadius + 16}
-              fill="#e2e8f0"
-              fontSize="12"
+              fill="#cbd5e1"
+              fontSize="11"
+              fontFamily="JetBrains Mono, monospace"
               fontWeight="500"
               textAnchor="middle"
             >
@@ -216,7 +223,7 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
             {/* Exposure tag */}
             <text
               x={node.x}
-              y={node.y + nodeRadius + 30}
+              y={node.y + nodeRadius + 28}
               fill="#64748b"
               fontSize="10"
               textAnchor="middle"
@@ -235,9 +242,9 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
               cx={node.x}
               cy={node.y}
               r={nodeRadius}
-              fill="#1e293b"
+              fill="#0f172a"
               stroke={node.color}
-              strokeWidth="3.5"
+              strokeWidth="3"
             />
             {/* Risk score badge inside circle */}
             <text
@@ -245,7 +252,8 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
               y={node.y + 5}
               fill="#f8fafc"
               fontSize="13"
-              fontWeight="bold"
+              fontFamily="JetBrains Mono, monospace"
+              fontWeight="600"
               textAnchor="middle"
             >
               {node.maxRisk}
@@ -254,8 +262,9 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
             <text
               x={node.x}
               y={node.y + nodeRadius + 16}
-              fill="#e2e8f0"
-              fontSize="12"
+              fill="#cbd5e1"
+              fontSize="11"
+              fontFamily="JetBrains Mono, monospace"
               fontWeight="500"
               textAnchor="middle"
             >
@@ -264,7 +273,7 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
             {/* Exposure tag */}
             <text
               x={node.x}
-              y={node.y + nodeRadius + 30}
+              y={node.y + nodeRadius + 28}
               fill="#64748b"
               fontSize="10"
               textAnchor="middle"
@@ -274,6 +283,26 @@ function AttackSurfaceGraph({ assets = [], findings = [] }) {
           </g>
         ))}
       </svg>
+
+      {/* Graph Legend Below SVG */}
+      <div className="graph-legend">
+        <div className="legend-item">
+          <span className="legend-dot dot-critical"></span>
+          Critical (&ge;76)
+        </div>
+        <div className="legend-item">
+          <span className="legend-dot dot-high"></span>
+          High (51–75)
+        </div>
+        <div className="legend-item">
+          <span className="legend-dot dot-medium"></span>
+          Medium (26–50)
+        </div>
+        <div className="legend-item">
+          <span className="legend-dot dot-low"></span>
+          Low (&le;25)
+        </div>
+      </div>
     </div>
   );
 }
