@@ -36,6 +36,15 @@ MOCK_CVE_DB: Dict[str, List[Dict[str, Any]]] = {
             "known_exploited": True,
         }
     ],
+    # Real CVE affecting Apache httpd 2.4.7 (used for live demo against scanme.nmap.org, an officially authorized Nmap test target)
+    "apache httpd:2.4.7": [
+        {
+            "cve_id": "CVE-2014-0226",
+            "cvss_score": 7.1,
+            "severity": "HIGH",
+            "known_exploited": False,
+        }
+    ],
 }
 
 

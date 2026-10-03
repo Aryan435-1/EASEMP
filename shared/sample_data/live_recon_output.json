@@ -1,0 +1,27 @@
+[
+  {
+    "asset": {
+      "hostname": "scanme.nmap.org",
+      "ip": "45.33.32.156",
+      "exposure": "external"
+    },
+    "services": [
+      {
+        "port": 22,
+        "protocol": "tcp",
+        "service_name": "ssh",
+        "product": "OpenSSH",
+        "version": "6.6.1p1 Ubuntu 2ubuntu2.13",
+        "banner": "OpenSSH 6.6.1p1 Ubuntu 2ubuntu2.13"
+      },
+      {
+        "port": 80,
+        "protocol": "tcp",
+        "service_name": "http",
+        "product": "Apache httpd",
+        "version": "2.4.7",
+        "banner": "Apache httpd 2.4.7"
+      }
+    ]
+  }
+]
