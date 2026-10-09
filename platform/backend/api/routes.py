@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from typing import Any, Dict, List
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
@@ -18,16 +18,20 @@ router = APIRouter()
 
 
 @router.get("/api/assets", response_model=List[Dict[str, Any]])
-def get_assets(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
-    """Retrieve a list of all target assets along with finding counts.
+def get_assets(
+    db: Session = Depends(get_db),
+    dataset: str = Query(default="sample", description="Dataset to query: 'sample' or 'live'"),
+) -> List[Dict[str, Any]]:
+    """Retrieve a list of target assets for the given dataset along with finding counts.
 
     Args:
         db (Session): SQLAlchemy database session.
+        dataset (str): Dataset label to filter by ('sample' or 'live'). Defaults to 'sample'.
 
     Returns:
         List[Dict[str, Any]]: List of asset dictionaries with finding_count.
     """
-    assets = db.query(Asset).all()
+    assets = db.query(Asset).filter(Asset.dataset == dataset).all()
     return [
         {
             "id": asset.id,
@@ -42,16 +46,26 @@ def get_assets(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
 
 
 @router.get("/api/findings", response_model=List[Dict[str, Any]])
-def get_findings(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
-    """Retrieve a list of all findings sorted by risk score in descending order.
+def get_findings(
+    db: Session = Depends(get_db),
+    dataset: str = Query(default="sample", description="Dataset to query: 'sample' or 'live'"),
+) -> List[Dict[str, Any]]:
+    """Retrieve findings for the given dataset sorted by risk score in descending order.
 
     Args:
         db (Session): SQLAlchemy database session.
+        dataset (str): Dataset label to filter by ('sample' or 'live'). Defaults to 'sample'.
 
     Returns:
         List[Dict[str, Any]]: List of finding dictionaries including associated asset hostname.
     """
-    findings = db.query(Finding).order_by(Finding.risk_score.desc().nullslast()).all()
+    findings = (
+        db.query(Finding)
+        .join(Asset, Finding.asset_id == Asset.id)
+        .filter(Asset.dataset == dataset)
+        .order_by(Finding.risk_score.desc().nullslast())
+        .all()
+    )
     return [
         {
             "id": finding.id,
@@ -73,17 +87,26 @@ def get_findings(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
 
 
 @router.get("/api/summary", response_model=Dict[str, int])
-def get_summary(db: Session = Depends(get_db)) -> Dict[str, int]:
-    """Retrieve summary metrics for assets, findings, and priority breakdowns.
+def get_summary(
+    db: Session = Depends(get_db),
+    dataset: str = Query(default="sample", description="Dataset to query: 'sample' or 'live'"),
+) -> Dict[str, int]:
+    """Retrieve summary metrics for assets, findings, and priority breakdowns for the given dataset.
 
     Args:
         db (Session): SQLAlchemy database session.
+        dataset (str): Dataset label to filter by ('sample' or 'live'). Defaults to 'sample'.
 
     Returns:
         Dict[str, int]: Summary dictionary containing total counts and priority breakdown.
     """
-    total_assets = db.query(Asset).count()
-    findings = db.query(Finding).all()
+    total_assets = db.query(Asset).filter(Asset.dataset == dataset).count()
+    findings = (
+        db.query(Finding)
+        .join(Asset, Finding.asset_id == Asset.id)
+        .filter(Asset.dataset == dataset)
+        .all()
+    )
     total_findings = len(findings)
 
     critical_count = sum(
@@ -110,22 +133,34 @@ def get_summary(db: Session = Depends(get_db)) -> Dict[str, int]:
 
 
 @router.get("/api/report", response_class=HTMLResponse)
-def get_report(db: Session = Depends(get_db)) -> HTMLResponse:
-    """Generate a self-contained, printable HTML security assessment report.
+def get_report(
+    db: Session = Depends(get_db),
+    dataset: str = Query(default="sample", description="Dataset to query: 'sample' or 'live'"),
+) -> HTMLResponse:
+    """Generate a self-contained, printable HTML security assessment report for the given dataset.
 
-    Queries all assets and findings from the database, renders an HTML document with
-    executive summary, asset inventory, and risk-ranked findings tables, formatted
-    with dark-mode styling matching the EEIP dashboard. Users can use the browser's
-    Print to PDF feature to save the document.
+    Queries assets and findings filtered by dataset from the database, renders an HTML document
+    with executive summary, asset inventory, and risk-ranked findings tables, formatted with
+    dark-mode styling matching the EEIP dashboard. Users can use the browser's Print to PDF
+    feature to save the document.
 
     Args:
         db (Session): SQLAlchemy database session.
+        dataset (str): Dataset label to filter by ('sample' or 'live'). Defaults to 'sample'.
 
     Returns:
         HTMLResponse: Self-contained HTML report string.
     """
-    assets = db.query(Asset).all()
-    findings = db.query(Finding).order_by(Finding.risk_score.desc().nullslast()).all()
+    dataset_label = "Live scan" if dataset == "live" else "Sample data"
+
+    assets = db.query(Asset).filter(Asset.dataset == dataset).all()
+    findings = (
+        db.query(Finding)
+        .join(Asset, Finding.asset_id == Asset.id)
+        .filter(Asset.dataset == dataset)
+        .order_by(Finding.risk_score.desc().nullslast())
+        .all()
+    )
 
     total_assets = len(assets)
     total_findings = len(findings)
@@ -315,7 +350,7 @@ def get_report(db: Session = Depends(get_db)) -> HTMLResponse:
 <body>
     <div class="report-container">
         <h1>Enterprise Attack Surface & Exposure Management Platform — Security Assessment Report</h1>
-        <div class="timestamp">Generated timestamp: {generated_timestamp}</div>
+        <div class="timestamp">Generated timestamp: {generated_timestamp} &nbsp;|&nbsp; Dataset: {dataset_label}</div>
 
         <div class="section">
             <h2>Executive Summary</h2>

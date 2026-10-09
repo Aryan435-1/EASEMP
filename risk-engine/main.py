@@ -8,6 +8,7 @@ This module orchestrates the full Risk Engine pipeline:
 """
 
 import json
+import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -107,8 +108,14 @@ def findings_to_dict(asset_findings: AssetFindings) -> Dict[str, Any]:
 
 if __name__ == "__main__":
     base_dir = Path(__file__).parent
-    input_path = base_dir.parent / "shared" / "sample_data" / "sample_recon_output.json"
-    output_path = base_dir / "findings_output.json"
+    if len(sys.argv) > 1 and sys.argv[1] == "live":
+        input_path = base_dir.parent / "shared" / "sample_data" / "live_recon_output.json"
+    else:
+        input_path = base_dir.parent / "shared" / "sample_data" / "sample_recon_output.json"
+    if len(sys.argv) > 1 and sys.argv[1] == "live":
+        output_path = base_dir / "findings_output_live.json"
+    else:
+        output_path = base_dir / "findings_output_sample.json"
 
     with open(input_path, "r", encoding="utf-8") as f:
         recon_data = json.load(f)

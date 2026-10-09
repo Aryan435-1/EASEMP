@@ -1,7 +1,7 @@
 """SQLAlchemy ORM models for Asset and Finding entities."""
 
 from typing import List, Optional
-from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, relationship
 
 from .database import Base
@@ -12,20 +12,25 @@ class Asset(Base):
 
     Attributes:
         id (int): Primary key, autoincrementing unique identifier.
-        hostname (str): Unique hostname of the asset (cannot be null).
+        hostname (str): Hostname of the asset (cannot be null).
         ip (Optional[str]): IP address of the asset.
         exposure (Optional[str]): Network exposure level ("internal" or "external").
         criticality (Optional[int]): Asset criticality score ranging from 0 to 10.
+        dataset (str): Dataset label this asset belongs to (e.g. "sample" or "live").
         findings (List[Finding]): One-to-many relationship with Finding records.
     """
 
     __tablename__ = "assets"
+    __table_args__ = (
+        UniqueConstraint("hostname", "dataset", name="uq_asset_hostname_dataset"),
+    )
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
-    hostname: Mapped[str] = Column(String, unique=True, nullable=False)
+    hostname: Mapped[str] = Column(String, nullable=False)
     ip: Mapped[Optional[str]] = Column(String, nullable=True)
     exposure: Mapped[Optional[str]] = Column(String, nullable=True)
     criticality: Mapped[Optional[int]] = Column(Integer, nullable=True)
+    dataset: Mapped[str] = Column(String, nullable=False, default="sample", index=True)
 
     # Relationships
     findings: Mapped[List["Finding"]] = relationship(
@@ -35,7 +40,8 @@ class Asset(Base):
     def __repr__(self) -> str:
         return (
             f"<Asset(id={self.id}, hostname='{self.hostname}', ip='{self.ip}', "
-            f"exposure='{self.exposure}', criticality={self.criticality})>"
+            f"exposure='{self.exposure}', criticality={self.criticality}, "
+            f"dataset='{self.dataset}')>"
         )
 
 

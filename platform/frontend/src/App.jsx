@@ -9,8 +9,9 @@ import AttackSurfaceGraph from './AttackSurfaceGraph';
  */
 function App() {
   // =========================================================================
-  // 1. STATE MANAGEMENT (UNTOUCHED)
+  // 1. STATE MANAGEMENT
   // =========================================================================
+  const [dataset, setDataset] = useState('sample');
   const [summary, setSummary] = useState(null);
   const [assets, setAssets] = useState([]);
   const [findings, setFindings] = useState([]);
@@ -18,7 +19,7 @@ function App() {
   const [error, setError] = useState(null);
 
   // =========================================================================
-  // 2. DATA FETCHING (UNTOUCHED)
+  // 2. DATA FETCHING
   // =========================================================================
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -27,9 +28,9 @@ function App() {
         setError(null);
 
         const [summaryRes, assetsRes, findingsRes] = await Promise.all([
-          fetch('http://127.0.0.1:8000/api/summary'),
-          fetch('http://127.0.0.1:8000/api/assets'),
-          fetch('http://127.0.0.1:8000/api/findings')
+          fetch(`http://127.0.0.1:8000/api/summary?dataset=${dataset}`),
+          fetch(`http://127.0.0.1:8000/api/assets?dataset=${dataset}`),
+          fetch(`http://127.0.0.1:8000/api/findings?dataset=${dataset}`)
         ]);
 
         if (!summaryRes.ok || !assetsRes.ok || !findingsRes.ok) {
@@ -52,10 +53,10 @@ function App() {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [dataset]);
 
   const handleDownloadReport = () => {
-    window.open('http://127.0.0.1:8000/api/report', '_blank');
+    window.open(`http://127.0.0.1:8000/api/report?dataset=${dataset}`, '_blank');
   };
 
   // =========================================================================
@@ -71,7 +72,9 @@ function App() {
     );
   }
 
-  if (loading || !summary) {
+  // Show full-page skeleton only on the very first load (summary not yet received).
+  // On dataset switches the page stays mounted; data swaps in when the fetch settles.
+  if (summary === null && loading) {
     return (
       <div className="app-shell">
         <aside className="sidebar">
@@ -128,7 +131,6 @@ function App() {
               <svg className="logo-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               </svg>
-              <span className="logo-text">EEIP</span>
             </div>
           </div>
 
@@ -180,9 +182,6 @@ function App() {
           </nav>
         </div>
 
-        <div className="sidebar-bottom">
-          <div className="sidebar-footer-text">EEIP v1.0 — Minor Project</div>
-        </div>
       </aside>
 
       {/* Main Content Scroll Area */}
@@ -200,6 +199,27 @@ function App() {
             <span className="status-badge">
               <span className="pulse-dot"></span>
               LIVE
+            </span>
+
+            {/* Dataset segmented toggle */}
+            <div className="dataset-toggle" role="group" aria-label="Select dataset">
+              <button
+                className={`dataset-toggle-btn${dataset === 'sample' ? ' dataset-toggle-active' : ''}`}
+                aria-pressed={dataset === 'sample'}
+                onClick={() => setDataset('sample')}
+              >
+                Sample data
+              </button>
+              <button
+                className={`dataset-toggle-btn${dataset === 'live' ? ' dataset-toggle-active' : ''}`}
+                aria-pressed={dataset === 'live'}
+                onClick={() => setDataset('live')}
+              >
+                Live scan
+              </button>
+            </div>
+            <span className="dataset-caption">
+              {dataset === 'live' ? 'Real scan of scanme.nmap.org' : 'Simulated lab data'}
             </span>
           </div>
 
