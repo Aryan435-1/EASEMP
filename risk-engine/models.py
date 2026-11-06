@@ -20,6 +20,7 @@ class Service:
     product: str = ""
     version: str = ""
     banner: str = ""
+    cpes: List[str] = field(default_factory=list)
 
 
 @dataclass

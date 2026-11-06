@@ -52,6 +52,7 @@ def process_recon_output(recon_data: List[Dict[str, Any]]) -> List[AssetFindings
                 product=svc_dict.get("product", ""),
                 version=svc_dict.get("version", ""),
                 banner=svc_dict.get("banner", ""),
+                cpes=svc_dict.get("cpes", []),
             )
 
             # Gather CVE correlation findings and rule-based misconfiguration findings

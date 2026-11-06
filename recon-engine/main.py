@@ -41,7 +41,8 @@ def run_recon(hostname: str, exposure: str = "external") -> dict:
             "service_name": port_info.get("service_name"),
             "product": port_info.get("product", ""),
             "version": port_info.get("version", ""),
-            "banner": port_info.get("banner", "")
+            "banner": port_info.get("banner", ""),
+            "cpes": port_info.get("cpes", [])
         })
 
     return {

@@ -12,7 +12,11 @@
         "service_name": "ssh",
         "product": "OpenSSH",
         "version": "6.6.1p1 Ubuntu 2ubuntu2.13",
-        "banner": "OpenSSH 6.6.1p1 Ubuntu 2ubuntu2.13"
+        "banner": "OpenSSH 6.6.1p1 Ubuntu 2ubuntu2.13",
+        "cpes": [
+          "cpe:/a:openbsd:openssh:6.6.1p1",
+          "cpe:/o:linux:linux_kernel"
+        ]
       },
       {
         "port": 80,
@@ -20,7 +24,10 @@
         "service_name": "http",
         "product": "Apache httpd",
         "version": "2.4.7",
-        "banner": "Apache httpd 2.4.7"
+        "banner": "Apache httpd 2.4.7",
+        "cpes": [
+          "cpe:/a:apache:http_server:2.4.7"
+        ]
       }
     ]
   }

@@ -8,6 +8,7 @@ python-nmap to work properly.
 
 import json
 from typing import Any, Dict, List
+import xml.etree.ElementTree as ET
 import nmap
 
 
@@ -23,6 +24,23 @@ def scan_ports(ip: str) -> List[Dict[str, Any]]:
     try:
         scanner = nmap.PortScanner()
         scanner.scan(ip, arguments='-sV -T3 --top-ports 100')
+
+        port_cpes: Dict[int, List[str]] = {}
+        try:
+            raw_xml = scanner.get_nmap_last_output()
+            if raw_xml:
+                root = ET.fromstring(raw_xml)
+                for port_elem in root.findall(".//host/ports/port"):
+                    port_id = port_elem.get("portid")
+                    if port_id is not None:
+                        cpes: List[str] = []
+                        for cpe_elem in port_elem.findall("service/cpe"):
+                            cpe_text = (cpe_elem.text or "").strip()
+                            if cpe_text and cpe_text not in cpes:
+                                cpes.append(cpe_text)
+                        port_cpes[int(port_id)] = cpes
+        except Exception:
+            port_cpes = {}
 
         if ip in scanner.all_hosts():
             host_data = scanner[ip]
@@ -41,7 +59,8 @@ def scan_ports(ip: str) -> List[Dict[str, Any]]:
                             "service_name": service_name,
                             "product": product,
                             "version": version,
-                            "banner": banner
+                            "banner": banner,
+                            "cpes": port_cpes.get(int(port), [])
                         })
 
     except Exception:

@@ -28,7 +28,11 @@
           "service_name": { "type": "string" },
           "product": { "type": "string" },
           "version": { "type": "string" },
-          "banner": { "type": "string" }
+          "banner": { "type": "string" },
+          "cpes": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
         }
       }
     }

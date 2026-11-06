@@ -9,11 +9,11 @@ to ``nvd_cache.store_cves_in_cache``.
 Return contract
 ---------------
 ``fetch_cves_for_cpe`` returns a non-empty list only when NVD reports at least
-one scoreable CVE.  An empty list ``[]`` is returned only when NVD genuinely
-reports zero CVEs for the CPE.  On any network or API failure the function
-raises :class:`NVDError` and never returns ``[]``, so callers can safely cache
-an empty list (negative result) but must not cache anything after an
-exception.
+one scoreable CVE.  An empty list ``[]`` means NVD reported zero CVEs, and an
+all-unscored result is an error so it is never cached as "no CVEs".  On any
+network or API failure the function raises :class:`NVDError` and never returns
+``[]``, so callers can safely cache an empty list (negative result) but must
+not cache anything after an exception.
 """
 
 import json
@@ -31,8 +31,8 @@ from dotenv import load_dotenv
 # Initialisation
 # ---------------------------------------------------------------------------
 
-# Load .env from the same directory as this file.  The file is never opened,
-# read, printed, or logged here; os.getenv is used inside functions only.
+# Load .env from this file's directory. python-dotenv reads it here; the key
+# itself is only read through os.getenv inside functions and is never logged.
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
 NVD_URL: str = "https://services.nvd.nist.gov/rest/json/cves/2.0"
@@ -122,7 +122,8 @@ def _get_json(url: str) -> dict:
                 "NVD request error (attempt %d/%d): %s", attempt, max_attempts, exc
             )
             last_exc = exc
-            _sleep_for_retry(attempt, retry_after=None)
+            if attempt < max_attempts:
+                _sleep_for_retry(attempt, retry_after=None)
             continue
 
         # --- 200 OK --------------------------------------------------------
@@ -137,13 +138,14 @@ def _get_json(url: str) -> dict:
                     max_attempts,
                 )
                 last_exc = NVDError("NVD returned a non-JSON 200 response")
-                _sleep_for_retry(attempt, retry_after=None)
+                if attempt < max_attempts:
+                    _sleep_for_retry(attempt, retry_after=None)
                 continue
 
         # --- 404 — do not retry --------------------------------------------
         if resp.status_code == 404:
             msg_header: str = resp.headers.get("message", "")
-            if "api" in msg_header.lower() or "key" in msg_header.lower():
+            if "apikey" in msg_header.lower() or "api key" in msg_header.lower():
                 raise NVDError(
                     f"NVD rejected the API key - check NVD_API_KEY in "
                     f"risk-engine/.env (the key must be activated and is "
@@ -170,7 +172,8 @@ def _get_json(url: str) -> dict:
                 max_attempts,
             )
             last_exc = NVDError(f"NVD HTTP {resp.status_code}")
-            _sleep_for_retry(attempt, retry_after=retry_after)
+            if attempt < max_attempts:
+                _sleep_for_retry(attempt, retry_after=retry_after)
             continue
 
         # --- Unexpected status ----------------------------------------------
@@ -384,6 +387,12 @@ def fetch_cves_for_cpe(cpe_name: str) -> list[dict]:
     if skipped:
         logger.info(
             "Skipped %d CVE(s) with no CVSS score for %r.", skipped, cpe_name
+        )
+
+    if total_results is not None and total_results > 0 and not all_cves:
+        raise NVDError(
+            f"NVD lists {total_results} CVE(s) for {cpe_name!r} "
+            f"but none have a CVSS score yet"
         )
 
     all_cves.sort(key=lambda c: (-c["cvss_score"], c["cve_id"]))
